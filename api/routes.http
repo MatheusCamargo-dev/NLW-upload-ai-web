@@ -12,3 +12,13 @@ Content-Type: image/png
 
 < ./daarui.mp3
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+# @name create-transcription
+POST http://localhost:3333/videos/18f57a14-edae-4b32-a1a4-22a297bf5049/transcription
+Content-Type: application/json
+
+{
+  "prompt": "teste"
+}
