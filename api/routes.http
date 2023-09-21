@@ -20,5 +20,17 @@ POST http://localhost:3333/videos/18f57a14-edae-4b32-a1a4-22a297bf5049/transcrip
 Content-Type: application/json
 
 {
-  "prompt": "teste"
+  "prompt": "marinha, kuma, roronoa zoro, companheira, nakama, one piece, mugiwaras, chapéus de palha, bando, três espadas, Mihawk, gran line, vivy, ussop,bando, wano, oden, ambição, haki do rei, sandai kitetsu, wado ichimonji, shisui, doflamingo, Orochi, Kaidou, Enma"
+}
+
+###
+
+# @name generate-ai-completion
+POST http://localhost:3333/ai/complete
+Content-Type: application/json
+
+{
+  "videoId": "18f57a14-edae-4b32-a1a4-22a297bf5049",
+  "temperature": 0.5,
+  "template": "create a simple resume of this video transcription: '''{transcription}'''"
 }
