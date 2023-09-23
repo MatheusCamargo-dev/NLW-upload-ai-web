@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@ffmpeg/core':
-    specifier: ^0.12.3
-    version: 0.12.3
   '@ffmpeg/ffmpeg':
     specifier: ^0.12.6
     version: 0.12.6
@@ -350,11 +347,6 @@ packages:
     resolution: {integrity: sha512-1S8uAY/MTJqVx0SC4epBq+N2yhuwtNwLbJYNZyhL2pO1ZVKn5HFXav5T41Ryzy9K9V7ZId2JB2oy/W4aCd9/2w==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
-
-  /@ffmpeg/core@0.12.3:
-    resolution: {integrity: sha512-HjTvLnb7WEbApO7vmscLsKfnpCf2OT4AspatST1GntUt/NZWILMHSKHer0SVCKi1ce3LQQ7tUQqS7qkjn4T4mg==}
-    engines: {node: '>=16.x'}
-    dev: false
 
   /@ffmpeg/ffmpeg@0.12.6:
     resolution: {integrity: sha512-4CuXDaqrCga5qBwVtiDDR45y65OGPYZd7VzwGCGz3QLdrQH7xaLYEjU19XL4DTCL0WnTSH8752b8Atyb1SiiLw==}

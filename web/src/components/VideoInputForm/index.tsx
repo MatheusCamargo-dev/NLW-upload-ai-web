@@ -4,6 +4,8 @@ import { Separator } from "@radix-ui/react-separator";
 import { Label } from "@radix-ui/react-label";
 import { Textarea } from "../ui/textarea";
 import { ChangeEvent, FormEvent, useMemo, useRef, useState } from "react";
+import { getFFmpeg } from "@/lib/ffmpeg";
+import { fetchFile } from "@ffmpeg/util";
 
 export default function VideoInputForm(){
 
@@ -20,11 +22,53 @@ export default function VideoInputForm(){
     setVideoFile(selectedFile)
   }
 
-  function convertVideoToAudio(video: File){
+  async function convertVideoToAudio(video: File){
+    console.log('Convert started.')
+
+    const ffmpeg = await getFFmpeg()
+
+    console.log('Create connection')
+
+    await ffmpeg.writeFile('input.mp4', await fetchFile(video))
+
+    // ffmpeg.on('log', log => {
+    //   console.log(log)
+    // })
+
+    ffmpeg.on('progress', progress => {
+      console.log('Convert progress:' + Math.round(progress.progress * 100))
+    })
+
+    console.log('exec')
+
+    await ffmpeg.exec([
+      '-i', 
+      'input.mp4', 
+      '-map', 
+      '0:a', 
+      '-b:a', 
+      '20k', 
+      '-acodec', 
+      'libmp3lame', 
+      'output.mp3'
+    ])
+
+    const data = await ffmpeg.readFile('output.mp3')
+
+    const audioFileBlob = new Blob([data], {type: 'audio/mpeg'})
+
+    const audioFile = new File([audioFileBlob], 'audio.mp3', {
+      type: 'audio/mpeg'
+    })
+
+    console.log('Convert finish')
+
+    return audioFile
+
 
   }
 
-  function handleUploadVideo(event: FormEvent<HTMLFormElement>) {
+  async function handleUploadVideo(event: FormEvent<HTMLFormElement>) {
 
     event.preventDefault()
 
@@ -33,6 +77,10 @@ export default function VideoInputForm(){
     if(!videoFile){
       return
     }
+
+    const audioFile = await convertVideoToAudio(videoFile)
+
+    console.log(audioFile)
 
   }
 
