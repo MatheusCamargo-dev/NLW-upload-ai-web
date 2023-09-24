@@ -6,10 +6,25 @@ import { Textarea } from "../ui/textarea";
 import { ChangeEvent, FormEvent, useMemo, useRef, useState } from "react";
 import { getFFmpeg } from "@/lib/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
+import { api } from "@/lib/axios";
 
-export default function VideoInputForm(){
+type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success'
+const statusMessage = {
+  waiting: '',
+  converting: 'Converting...',
+  generating: 'transcribing...',
+  uploading: 'Uploading...',
+  success: 'Success!'
+}
+
+interface VideoInputFormProps {
+  onVideoUploaded: (id: string) => void
+}
+
+export default function VideoInputForm({ onVideoUploaded }: VideoInputFormProps){
 
   const [videoFile, setVideoFile] = useState<File | null>(null)
+  const [status, setStatus] = useState<Status>('waiting')
   const promptInputRef = useRef<HTMLTextAreaElement>(null)
 
   function handleFileSelected (event: ChangeEvent<HTMLInputElement>){
@@ -65,7 +80,6 @@ export default function VideoInputForm(){
 
     return audioFile
 
-
   }
 
   async function handleUploadVideo(event: FormEvent<HTMLFormElement>) {
@@ -78,9 +92,31 @@ export default function VideoInputForm(){
       return
     }
 
+    setStatus('converting')
+
     const audioFile = await convertVideoToAudio(videoFile)
 
-    console.log(audioFile)
+    const data = new FormData()
+
+    data.append('file', audioFile)
+
+    setStatus('uploading')
+
+
+    const response = await api.post('/videos', data)
+
+    const videoId = response.data.video.id
+
+    setStatus('generating')
+
+
+    await api.post(`/videos/${videoId}/transcription`, {
+      prompt
+    })
+
+    setStatus('success')
+
+    onVideoUploaded(videoId)
 
   }
 
@@ -115,13 +151,22 @@ export default function VideoInputForm(){
         <Label htmlFor="transcription_prompt">Transcription prompt</Label>
         <Textarea 
           id="transcription_prompt" 
+          disabled={status !== 'waiting'}
           ref={promptInputRef}
           className="h-20 leading-relaxed resize-none"
           placeholder="Include keywords mentioned in the video separated by commas. "
         />
       </div>
 
-      <Button type="submit" className="w-full">Load video<Upload className="h-4 w-4 ml-2"/></Button>
+      <Button 
+        type="submit"
+        disabled={status !== 'waiting'}
+        className="w-full data-[success=true]:text-white"
+        data-success={status === 'success'}
+      >
+       {status === 'waiting' ? (<>Load video
+        <Upload className="h-4 w-4 ml-2"/> </>) : statusMessage[status]}
+      </Button>
     </form>
   )
 }
